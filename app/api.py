@@ -44,18 +44,27 @@ def calculate_currency_rate(
             if currency_rate:
                 result = currency_rate * amount
                 return round(result, 3)
-            else:
-                return "Invalid Currency ISO"
-        except KeyError:
-            return "Invalid response data"
+        except Exception as ex:
+            return None
     else:
         uah_rate = get_hryvna_rate()
-        print(uah_rate)
-        if currency_to_sell == "UAH":
-            result = uah_rate.get(currency_to_buy.lower()).get("buy") * amount
-            return result
+        if uah_rate:
+            if currency_to_sell == currency_to_buy:
+                return amount
+
+            elif currency_to_sell == "UAH":
+                exchange_currency_data = uah_rate.get(currency_to_buy)
+                if exchange_currency_data:
+                    result = exchange_currency_data.get("sale")
+                    return result
+
+            elif currency_to_buy == "UAH":
+                exchange_currency_data = uah_rate.get(currency_to_sell)
+                if exchange_currency_data:
+                    result = exchange_currency_data.get("buy")
+                    return result
 
 
 if __name__ == "__main__":
-    print(get_hryvna_rate())
-    # print(calculate_currency_rate("EUR", "UAH", 1))
+    # print(get_hryvna_rate())
+    print(calculate_currency_rate("UAH", "UAH", 1))
