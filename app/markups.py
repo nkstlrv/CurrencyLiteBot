@@ -7,10 +7,3 @@ class MainMenuMarkup:
     )
     b2 = types.InlineKeyboardButton("Calculate Buy/Sell 💱", callback_data="main_calc")
     markup = types.InlineKeyboardMarkup(row_width=1).add(b1, b2)
-
-
-class CurrencyMarkup:
-    uah = types.KeyboardButton("Hryvna (UAH)")
-    usd = types.KeyboardButton("US Dollar (USD)")
-    eur = types.KeyboardButton("Euro (EUR)")
-    markup = types.ReplyKeyboardMarkup(resize_keyboard=True).add(uah, usd, eur)

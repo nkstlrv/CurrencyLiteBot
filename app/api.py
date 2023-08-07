@@ -33,9 +33,7 @@ def get_hryvna_rate():
             return None
 
 
-def calculate_currency_rate(
-    currency_to_sell: str, currency_to_buy: str, amount: float | int
-):
+def calculate_currency_rate(currency_to_sell: str, currency_to_buy: str, amount: float):
     if "UAH" not in (currency_to_buy, currency_to_sell):
         try:
             currency_rate = client.latest(base_currency=currency_to_sell)["data"].get(
