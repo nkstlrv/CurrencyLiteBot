@@ -4,6 +4,9 @@ from aiogram import Bot, Dispatcher, executor, types
 import time
 from markups import MainMenuMarkup
 from api import get_hryvna_rate
+import logging
+
+logging.basicConfig(format="%(levelname)s: %(message)s", level=logging.INFO)
 
 # loading local environment variables
 load_dotenv()
@@ -41,38 +44,36 @@ async def callback(call):
         rate: dict = get_hryvna_rate()
 
         if rate:
-            if rate != "Invalid response data":
-                usd_buy = rate.get("usd").get("buy")
-                usd_sell = rate.get("usd").get("sell")
+            usd_buy = rate.get("USD").get("buy")
+            usd_sell = rate.get("USD").get("sale")
 
-                eur_buy = rate.get("eur").get("buy")
-                eur_sell = rate.get("eur").get("sell")
+            eur_buy = rate.get("EUR").get("buy")
+            eur_sell = rate.get("EUR").get("sale")
 
-                message = (
-                    f"💲 <b>US Dollar (USD)</b>: \n"
-                    f"<b>Buy</b>:  {usd_buy} \n"
-                    f"<b>Sell</b>:  {usd_sell} \n\n"
-                    f"💶 <b>Euro (EUR)</b>: \n"
-                    f"<b>Buy</b>:  {eur_buy} \n"
-                    f"<b>Sell</b>:  {eur_sell}"
-                )
+            message = (
+                f"💲 <b>US Dollar (USD)</b>: \n"
+                f"<b>Buy</b>:  {usd_buy} \n"
+                f"<b>Sell</b>:  {usd_sell} \n\n"
+                f"💶 <b>Euro (EUR)</b>: \n"
+                f"<b>Buy</b>:  {eur_buy} \n"
+                f"<b>Sell</b>:  {eur_sell}"
+            )
 
-                await bot.send_message(
-                    call.from_user.id, "<b><i>Hryvna Exchange Rate</i></b>: 🟨🟦"
-                )
-                await bot.send_message(call.from_user.id, message, parse_mode="html")
+            await bot.send_message(
+                call.from_user.id, "<b><i>Hryvna USD/EUR Rate</i></b>: 🟨🟦"
+            )
+            await bot.send_message(call.from_user.id, message, parse_mode="html")
         else:
             await bot.send_message(call.from_user.id, "Currency server error")
 
-    elif call.data == "main_exchange_rate":
-        await bot.send_message(call.from_user.id, "Currencies Exchange Rate 📊")
-
     elif call.data == "main_calc":
-        await bot.send_message(call.from_user.id, "Calculate Buy/Sell 🤝")
+        await bot.send_message(call.from_user.id, "Calculate Buy/Sell 💱")
 
     else:
         await bot.send_message(call.from_user.id, "Unknown command")
 
 
 if __name__ == "__main__":
+    logging.info("[STARTING SERVER...]")
     executor.start_polling(dp)
+    logging.info("SERVER STOPPED]")
