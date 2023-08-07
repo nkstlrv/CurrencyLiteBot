@@ -29,5 +29,22 @@ async def start(message: types.Message):
     )
 
 
+# Main Menu callback handler
+@dp.callback_query_handler(text_startswith="m")
+async def callback(call):
+    # print(call.data)
+    if call.data == "main_hryvna":
+        await bot.send_message(call.from_user.id, "Hryvna Exchange Rate ₴")
+
+    elif call.data == "main_exchange_rate":
+        await bot.send_message(call.from_user.id, "Currencies Exchange Rate 📊")
+
+    elif call.data == "main_calc":
+        await bot.send_message(call.from_user.id, "Calculate Buy/Sell 🤝")
+
+    else:
+        await bot.send_message(call.from_user.id, "Unknown command")
+
+
 if __name__ == "__main__":
-    executor.start_polling(dp, skip_updates=True)
+    executor.start_polling(dp)
