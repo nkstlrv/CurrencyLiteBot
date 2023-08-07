@@ -3,7 +3,7 @@ from aiogram import types
 
 class MainMenuMarkup:
     b1 = types.InlineKeyboardButton(
-        "Hryvna Exchange Rate ₴", callback_data="main_hryvna"
+        "Hryvna Exchange Rate 🟨🟦", callback_data="main_hryvna"
     )
     b2 = types.InlineKeyboardButton(
         "Currencies Exchange Rate 💱", callback_data="main_exchange_rate"

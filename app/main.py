@@ -3,6 +3,7 @@ from dotenv import load_dotenv
 from aiogram import Bot, Dispatcher, executor, types
 import time
 from markups import MainMenuMarkup
+from api import get_hryvna_rate
 
 # loading local environment variables
 load_dotenv()
@@ -21,6 +22,9 @@ async def start(message: types.Message):
     )
     time.sleep(1)
     await message.answer("This is <b>CurrencyLite</b> bot 🤖", parse_mode="HTML")
+    await message.answer(
+        "Available currencies: (US Dollar, Euro, Hryvna)", parse_mode="HTML"
+    )
     time.sleep(1)
     await message.answer(
         "<b>Main Menu</b> ⚙",
@@ -34,7 +38,31 @@ async def start(message: types.Message):
 async def callback(call):
     # print(call.data)
     if call.data == "main_hryvna":
-        await bot.send_message(call.from_user.id, "Hryvna Exchange Rate ₴")
+        rate: dict = get_hryvna_rate()
+
+        if rate:
+            if rate != "Invalid response data":
+                usd_buy = rate.get("usd").get("buy")
+                usd_sell = rate.get("usd").get("sell")
+
+                eur_buy = rate.get("eur").get("buy")
+                eur_sell = rate.get("eur").get("sell")
+
+                message = (
+                    f"💲 <b>US Dollar (USD)</b>: \n"
+                    f"<b>Buy</b>:  {usd_buy} \n"
+                    f"<b>Sell</b>:  {usd_sell} \n\n"
+                    f"💶 <b>Euro (EUR)</b>: \n"
+                    f"<b>Buy</b>:  {eur_buy} \n"
+                    f"<b>Sell</b>:  {eur_sell}"
+                )
+
+                await bot.send_message(
+                    call.from_user.id, "<b><i>Hryvna Exchange Rate</i></b>: 🟨🟦"
+                )
+                await bot.send_message(call.from_user.id, message, parse_mode="html")
+        else:
+            await bot.send_message(call.from_user.id, "Currency server error")
 
     elif call.data == "main_exchange_rate":
         await bot.send_message(call.from_user.id, "Currencies Exchange Rate 📊")
