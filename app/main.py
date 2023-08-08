@@ -19,16 +19,6 @@ dp = Dispatcher(bot)
 reply_user_messages = False
 
 
-def set_reply_user_false():
-    global reply_user_messages
-    reply_user_messages = False
-
-
-def set_reply_user_true():
-    global reply_user_messages
-    reply_user_messages = True
-
-
 @dp.message_handler(commands=["start"])
 async def start(message: types.Message):
     await message.answer(
@@ -52,7 +42,6 @@ async def start(message: types.Message):
 # Main Menu callback handler
 @dp.callback_query_handler(text_startswith="m")
 async def callback(call):
-    # print(call.data)
     if call.data == "main_hryvna":
         rate: dict = get_hryvna_rate()
 
@@ -91,7 +80,6 @@ async def callback(call):
             "For example: usd # uah # 5.50",
             parse_mode="html",
         )
-        set_reply_user_true()
 
     else:
         await bot.send_message(call.from_user.id, "Unknown command")
@@ -99,31 +87,30 @@ async def callback(call):
 
 @dp.message_handler(content_types=["text"])
 async def menu(message: types.Message):
-    query: list = [param.strip() for param in message.text.split("#")]
+    if "#" in message.text:
+        query: list = [param.strip() for param in message.text.split("#")]
 
-    result = None
+        result = None
 
-    try:
-        currency_to_sell = query[0].upper()
-        currency_to_buy = query[1].upper()
-        amount = float(query[2])
+        try:
+            currency_to_sell = query[0].upper()
+            currency_to_buy = query[1].upper()
+            amount = float(query[2])
 
-        result = calculate_currency_rate(currency_to_sell, currency_to_buy, amount)
+            result = calculate_currency_rate(currency_to_sell, currency_to_buy, amount)
 
-    except ValueError:
-        await message.answer("Invalid query format. Try again")
+        except IndexError:
+            await message.answer("❗ Invalid query format. Try again")
 
-    if result is not None:
-        await message.answer(result)
-        set_reply_user_false()
+        except ValueError:
+            await message.answer("❗ Invalid query format. Try again")
 
-    else:
-        await message.answer("Invalid query format. Try again")
+        if result is not None:
+            await message.answer("result", parse_mode="html")
+            await message.answer(result)
 
 
 if __name__ == "__main__":
     logging.info("[STARTING SERVER...]")
-    executor.start_polling(
-        dp, on_startup=set_reply_user_false(), on_shutdown=set_reply_user_false()
-    )
+    executor.start_polling(dp)
     logging.info("SERVER STOPPED]")
