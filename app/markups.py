@@ -5,5 +5,11 @@ class MainMenuMarkup:
     b1 = types.InlineKeyboardButton(
         "Hryvna USD/EUR Rate 🟨🟦", callback_data="main_hryvna"
     )
-    b2 = types.InlineKeyboardButton("Calculate Buy/Sell 💱", callback_data="main_calc")
+    b2 = types.InlineKeyboardButton("Calculate Buy/Sell 💵 💶", callback_data="main_calc")
     markup = types.InlineKeyboardMarkup(row_width=1).add(b1, b2)
+
+
+class CallMainMenu:
+    markup = types.ReplyKeyboardMarkup(resize_keyboard=True).add(
+        types.KeyboardButton("/menu")
+    )
