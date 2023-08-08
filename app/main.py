@@ -2,7 +2,7 @@ import os
 from dotenv import load_dotenv
 from aiogram import Bot, Dispatcher, executor, types
 import time
-from markups import MainMenuMarkup
+from markups import MainMenuMarkup, CallMainMenu
 from api import get_hryvna_rate, calculate_currency_rate
 import logging
 
@@ -29,9 +29,20 @@ async def start(message: types.Message):
     time.sleep(1)
     await message.answer("This is <b>CurrencyLite</b> bot 🤖", parse_mode="HTML")
     await message.answer(
-        "Available currencies: (US Dollar, Euro, Hryvna)", parse_mode="HTML"
+        "Available currencies: (US Dollar, Euro, Hryvna)",
+        parse_mode="HTML",
+        reply_markup=CallMainMenu.markup,
     )
     time.sleep(1)
+    await message.answer(
+        "<b>Main Menu</b> ⚙",
+        parse_mode="HTML",
+        reply_markup=MainMenuMarkup.markup,
+    )
+
+
+@dp.message_handler(commands=["menu"])
+async def start(message: types.Message):
     await message.answer(
         "<b>Main Menu</b> ⚙",
         parse_mode="HTML",
@@ -70,14 +81,14 @@ async def callback(call):
 
     elif call.data == "main_calc":
         await bot.send_message(
-            call.from_user.id, "<b>Calculate Buy/Sell</b> 💱", parse_mode="html"
+            call.from_user.id, "<b>Calculate Buy/Sell</b> 💵 💶", parse_mode="html"
         )
         time.sleep(1)
         await bot.send_message(
             call.from_user.id,
             "Pass parameters in format: \n\n"
-            "<b><i>currency to sell # currency to buy # amount</i></b>\n\n"
-            "For example: usd # uah # 5.50",
+            "<b><i>currency to sell @ currency to buy @ sale amount</i></b>\n\n"
+            "For example: usd @ uah @ 5.50",
             parse_mode="html",
         )
 
@@ -87,10 +98,8 @@ async def callback(call):
 
 @dp.message_handler(content_types=["text"])
 async def menu(message: types.Message):
-    if "#" in message.text:
-        query: list = [param.strip() for param in message.text.split("#")]
-
-        result = None
+    if "@" in message.text:
+        query: list = [param.strip() for param in message.text.split("@")]
 
         try:
             currency_to_sell = query[0].upper()
@@ -99,15 +108,18 @@ async def menu(message: types.Message):
 
             result = calculate_currency_rate(currency_to_sell, currency_to_buy, amount)
 
+            if result is not None:
+                await message.answer(
+                    f"<b>{currency_to_sell} to {currency_to_buy}</b>:",
+                    parse_mode="html",
+                )
+                await message.answer(f"{result} {currency_to_buy}")
+
         except IndexError:
             await message.answer("❗ Invalid query format. Try again")
 
         except ValueError:
             await message.answer("❗ Invalid query format. Try again")
-
-        if result is not None:
-            await message.answer("result", parse_mode="html")
-            await message.answer(result)
 
 
 if __name__ == "__main__":

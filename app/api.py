@@ -41,7 +41,7 @@ def calculate_currency_rate(currency_to_sell: str, currency_to_buy: str, amount:
             )
             if currency_rate:
                 result = currency_rate * amount
-                return round(result, 3)
+                return round(result, 2)
         except Exception as ex:
             return None
     else:
@@ -51,18 +51,18 @@ def calculate_currency_rate(currency_to_sell: str, currency_to_buy: str, amount:
                 return amount
 
             elif currency_to_sell == "UAH":
-                exchange_currency_data = uah_rate.get(currency_to_buy)
+                exchange_currency_data: dict = uah_rate.get(currency_to_buy)
                 if exchange_currency_data:
-                    result = exchange_currency_data.get("sale")
-                    return result
+                    result = amount / float(exchange_currency_data.get("sale"))
+                    return round(result, 2)
 
             elif currency_to_buy == "UAH":
                 exchange_currency_data = uah_rate.get(currency_to_sell)
                 if exchange_currency_data:
-                    result = exchange_currency_data.get("buy")
-                    return result
+                    result = float(exchange_currency_data.get("buy")) * amount
+                    return round(result, 2)
 
 
 if __name__ == "__main__":
     # print(get_hryvna_rate())
-    print(calculate_currency_rate("UAH", "UAH", 1))
+    print(calculate_currency_rate("UAH", "USD", 37.60))
