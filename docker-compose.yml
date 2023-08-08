@@ -1,0 +1,6 @@
+version: "latest"
+
+services:
+  bot:
+    container_name: currency_lite_bot
+    build: .
